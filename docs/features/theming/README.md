@@ -51,11 +51,38 @@ resources/views/
 
 ---
 
+## Theme Resolution
+
+The active theme is stored on `companies.theme` (default: `'default'`). All public templates are resolved from `resources/views/themes/{theme}/`. In Phase 1 only `default` exists. Adding a second theme is creating a new directory — zero PHP changes.
+
+```php
+// In AppServiceProvider or a view composer:
+$theme = $company->theme ?? 'default';
+view()->share('theme', $theme);
+
+// Blade templates reference the theme:
+// resources/views/themes/default/layouts/public.blade.php
+// resources/views/themes/default/blocks/rich_text.blade.php
+// resources/views/themes/minimal/layouts/public.blade.php  (future)
+```
+
+`BlockRendererService` resolves block partials through the theme:
+
+```php
+public function resolvePartial(string $type, string $theme): string
+{
+    $themed = "themes/{$theme}/blocks/{$type}";
+    $fallback = "themes/default/blocks/{$type}";
+
+    return view()->exists($themed) ? $themed : $fallback;
+}
+```
+
+Unknown block types in a theme fall back to the `default` theme partial. If neither exists, the block is silently skipped.
+
 ## CSS & Branding
 
-The public site uses a minimal CSS file (no Tailwind — Tailwind is admin-only). A single `public.css` file handles layout, typography, and colour tokens.
-
-Primary colour is injected as a CSS custom property in `<head>`:
+Each theme directory has its own `public.css`. No Tailwind on the public site — Tailwind is admin-only. Primary colour is injected as a CSS custom property in `<head>`:
 
 ```html
 <style>

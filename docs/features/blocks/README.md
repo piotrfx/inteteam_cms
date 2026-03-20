@@ -282,15 +282,61 @@ Reordering: drag-and-drop via `@dnd-kit/core` (lightweight, accessible). Each bl
 
 ---
 
+## Block Type Registry
+
+Block types are never defined in a hardcoded enum. They register themselves via `BlockTypeRegistry` at boot time. This means adding a new block type never requires editing existing files — only adding new ones.
+
+```php
+final class BlockTypeRegistry
+{
+    private static array $types = [];
+
+    public static function register(
+        string $type,
+        string $label,
+        string $rendererClass,
+        string $validatorClass,
+        bool   $requiresCrm = false,
+        string $plan = 'starter',       -- minimum plan required to use this block
+    ): void {
+        static::$types[$type] = compact(
+            'label', 'rendererClass', 'validatorClass', 'requiresCrm', 'plan'
+        );
+    }
+
+    public static function all(): array              { return array_keys(static::$types); }
+    public static function forPlan(string $plan): array  { /* filter by plan tier */ }
+    public static function renderer(string $type): ?string { return static::$types[$type]['rendererClass'] ?? null; }
+    public static function validator(string $type): ?string { return static::$types[$type]['validatorClass'] ?? null; }
+    public static function requiresCrm(string $type): bool  { return static::$types[$type]['requiresCrm'] ?? false; }
+}
+```
+
+Registration happens in `AppServiceProvider::boot()`:
+
+```php
+BlockTypeRegistry::register('rich_text',  'Text',     RichTextRenderer::class,  RichTextValidator::class);
+BlockTypeRegistry::register('image',      'Image',    ImageRenderer::class,     ImageValidator::class);
+BlockTypeRegistry::register('heading',    'Heading',  HeadingRenderer::class,   HeadingValidator::class);
+BlockTypeRegistry::register('cta',        'CTA',      CtaRenderer::class,       CtaValidator::class);
+BlockTypeRegistry::register('divider',    'Divider',  DividerRenderer::class,   DividerValidator::class);
+BlockTypeRegistry::register('raw_html',   'HTML',     RawHtmlRenderer::class,   RawHtmlValidator::class);
+// Phase 2 — CRM blocks:
+BlockTypeRegistry::register('gallery',    'Gallery',  GalleryRenderer::class,   GalleryValidator::class,   requiresCrm: true);
+BlockTypeRegistry::register('crm_form',   'Form',     CrmFormRenderer::class,   CrmFormValidator::class,   requiresCrm: true);
+BlockTypeRegistry::register('storefront', 'Shop',     StorefrontRenderer::class,StorefrontValidator::class,requiresCrm: true);
+BlockTypeRegistry::register('business_updates', 'Updates', UpdatesRenderer::class, UpdatesValidator::class, requiresCrm: true);
+```
+
 ## Block Validation (PHP)
 
-Form requests for page/post save validate the blocks array:
+Form requests for page/post save validate the blocks array using the registry:
 
 ```php
 'blocks'             => ['present', 'array'],
 'blocks.*.id'        => ['required', 'string'],
-'blocks.*.type'      => ['required', 'string', Rule::in(BlockType::all())],
+'blocks.*.type'      => ['required', 'string', Rule::in(BlockTypeRegistry::all())],
 'blocks.*.data'      => ['required', 'array'],
 ```
 
-Each block type has its own data validator in `BlockDataValidator::validate($type, $data)`. Unknown types are rejected (validated against the enum).
+Each block type has its own validator class (registered above). `BlockRendererService` resolves the renderer class from the registry. Unknown block types are skipped silently (backward compat) during rendering, rejected with a validation error during save.

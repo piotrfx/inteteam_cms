@@ -108,7 +108,11 @@ seo_price_range             ENUM('£','££','£££') NULL
 
 -- Branding
 primary_colour  VARCHAR NULL            -- hex
+theme           VARCHAR DEFAULT 'default'  -- template dir: resources/views/themes/{theme}/
 settings        JSON NULL               -- catch-all for future site options
+
+-- Subscription tier (syncs from SSO subscriptions.cms claim in Phase 3)
+plan            ENUM('starter','standard','pro','enterprise') DEFAULT 'starter'
 
 is_active       BOOLEAN DEFAULT true
 created_at, updated_at, deleted_at
@@ -134,9 +138,13 @@ company_id      FK → companies
 title           VARCHAR
 slug            VARCHAR
 type            ENUM('home','about','contact','privacy','terms','custom')
-blocks          JSON NOT NULL DEFAULT '[]'    -- ordered array of block objects
+blocks          JSON NOT NULL DEFAULT '[]'    -- live blocks (canonical copy from live_revision)
 status          ENUM('draft','published')
 published_at    TIMESTAMP NULL
+
+-- Revision pointers (see cms_page_revisions table + features/revisions/)
+live_revision_id    FK → cms_page_revisions NULL  -- currently live content
+staged_revision_id  FK → cms_page_revisions NULL  -- AI/editor staged changes, awaiting approval
 
 -- SEO overrides (null = inherit site default)
 seo_title           VARCHAR NULL
@@ -161,10 +169,14 @@ author_id       FK → cms_users
 title           VARCHAR
 slug            VARCHAR
 excerpt         TEXT NULL
-blocks          JSON NOT NULL DEFAULT '[]'
+blocks          JSON NOT NULL DEFAULT '[]'    -- live blocks (canonical copy from live_revision)
 status          ENUM('draft','published','scheduled')
 published_at    TIMESTAMP NULL
 featured_image_path VARCHAR NULL
+
+-- Revision pointers
+live_revision_id    FK → cms_page_revisions NULL
+staged_revision_id  FK → cms_page_revisions NULL
 
 -- SEO overrides
 seo_title           VARCHAR NULL
@@ -177,6 +189,57 @@ created_at, updated_at, deleted_at
 
 INDEX idx_posts_company_status_published (company_id, status, published_at)
 INDEX idx_posts_company_slug (company_id, slug)
+```
+
+### `cms_page_revisions`
+```sql
+id              ULID PK
+company_id      FK → companies
+content_type    ENUM('page','post')
+content_id      ULID                        -- cms_pages.id or cms_posts.id (no FK, polymorphic-free)
+blocks          JSON NOT NULL               -- full snapshot of blocks at this point
+summary         VARCHAR NULL                -- human/AI description: "Added repair process section"
+created_by_type ENUM('user','ai_agent')
+created_by_id   VARCHAR NULL                -- cms_users.id if user, agent name if ai_agent
+ai_session_id   VARCHAR NULL                -- MCP session reference for AI-created revisions
+created_at
+
+INDEX idx_revisions_content (content_type, content_id, created_at)
+INDEX idx_revisions_company_created (company_id, created_at)
+```
+
+Note: `content_id` is intentionally not a FK constraint. The parent can be a page or a post, and we want to keep revision history even if the page is soft-deleted. Use `content_type` + `content_id` to join manually where needed.
+
+### `cms_preview_tokens`
+```sql
+id          ULID PK
+company_id  FK → companies
+content_type ENUM('page','post')
+content_id  ULID
+revision_id FK → cms_page_revisions
+token       VARCHAR UNIQUE              -- random 64-char token
+expires_at  TIMESTAMP                   -- 48 hours from creation
+viewed_at   TIMESTAMP NULL
+created_by_type ENUM('user','ai_agent')
+created_at
+
+INDEX idx_preview_tokens_token (token)
+INDEX idx_preview_tokens_company (company_id, expires_at)
+```
+
+### `cms_mcp_tokens`
+```sql
+id          ULID PK
+company_id  FK → companies
+name        VARCHAR                     -- e.g. "Claude.ai assistant"
+token_hash  VARCHAR UNIQUE              -- SHA-256 of the raw token
+permissions JSON NOT NULL DEFAULT '["read"]'  -- ["read","write","publish"]
+last_used_at TIMESTAMP NULL
+expires_at  TIMESTAMP NULL              -- null = no expiry
+created_by  FK → cms_users
+created_at, revoked_at NULL
+
+INDEX idx_mcp_tokens_company (company_id)
 ```
 
 ### `cms_navigation`
@@ -246,6 +309,8 @@ CRM blocks are rendered server-side at page request time: `CrmApiClient` fetches
 | Public site (Blade themes) | 1 | `features/theming/` |
 | SEO metadata, sitemap, robots.txt | 1 | `features/seo/` |
 | CRM integration (gallery, forms, storefront) | 2 | `features/crm_integration/` |
+| Revisions & staging preview | 2 | `features/revisions/` |
+| MCP server — AI page editing | 2 | `features/mcp/` |
 | Authentication — SSO | 3 | `features/auth/` |
 
 ---
@@ -265,15 +330,21 @@ A shop owner can log in, manage their site, build pages/posts with local blocks,
 - SEO: per-page meta, OG, Twitter Card, JSON-LD, sitemap.xml, robots.txt
 - PHPUnit feature test suite
 
-### Phase 2 — CRM Integration
+### Phase 2 — CRM Integration + AI Editing
 
-Shop owners can embed live CRM data into their pages.
+Shop owners can embed live CRM data and let an AI assistant edit their pages.
 
 - `CrmApiClient` HTTP service
 - Per-company CRM connection settings (base URL + API key)
 - Block types: `gallery`, `crm_form`, `storefront`, `business_updates`
 - Redis caching of CRM responses (5 min TTL)
 - Admin: block picker shows CRM blocks only when CRM is connected
+- `BlockTypeRegistry` — block types self-register at boot (never a hardcoded enum)
+- Revision system: `cms_page_revisions` table, `staged_revision_id` / `live_revision_id` on pages + posts
+- Staging preview: `cms_preview_tokens`, preview URL served at `/preview/{token}` with approval banner
+- MCP server: JSON-RPC 2.0 endpoint at `/mcp/v1` exposing read/write/publish tools
+- `cms_mcp_tokens`: per-company API keys for AI clients
+- AI edits always go to staged revision — never directly to live
 
 ### Phase 3 — SSO
 
