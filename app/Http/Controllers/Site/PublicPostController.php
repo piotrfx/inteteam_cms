@@ -12,7 +12,6 @@ use App\Services\SeoMetaService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\View\View;
 
 final class PublicPostController extends Controller
 {
@@ -21,11 +20,11 @@ final class PublicPostController extends Controller
         private readonly SeoMetaService $seoMeta,
     ) {}
 
-    public function index(): View|Response
+    public function index(): Response
     {
-        $company  = app('current_company');
+        $company = app('current_company');
         $cacheKey = "cms:blog:{$company->id}";
-        $theme    = $company->theme ?? 'default';
+        $theme = $company->theme ?? 'default';
 
         $html = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($company, $theme): string {
             /** @var Collection<int, CmsPost> $posts */
@@ -35,22 +34,23 @@ final class PublicPostController extends Controller
                 ->orderByDesc('published_at')
                 ->get(['id', 'title', 'slug', 'excerpt', 'featured_image_path', 'published_at']);
 
+            // @phpstan-ignore argument.type
             return view("themes.{$theme}.blog", [
                 'company' => $company,
-                'posts'   => $posts,
-                'seo'     => $this->seoMeta->forBlog($company),
-                'nav'     => $this->resolveNav($company->id),
+                'posts' => $posts,
+                'seo' => $this->seoMeta->forBlog($company),
+                'nav' => $this->resolveNav($company->id),
             ])->render();
         });
 
         return response($html, 200)->header('Content-Type', 'text/html');
     }
 
-    public function show(string $slug): View|Response
+    public function show(string $slug): Response
     {
-        $company  = app('current_company');
+        $company = app('current_company');
         $cacheKey = "cms:post:{$company->id}:{$slug}";
-        $theme    = $company->theme ?? 'default';
+        $theme = $company->theme ?? 'default';
 
         $html = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($company, $slug, $theme): ?string {
             $post = CmsPost::withoutGlobalScopes()
@@ -60,16 +60,17 @@ final class PublicPostController extends Controller
                 ->where('status', 'published')
                 ->first();
 
-            if (! $post) {
+            if (!$post) {
                 return null;
             }
 
+            // @phpstan-ignore argument.type
             return view("themes.{$theme}.post", [
-                'company'        => $company,
-                'post'           => $post,
-                'renderedBlocks' => $this->blockRenderer->render($post->blocks ?? []),
-                'seo'            => $this->seoMeta->forPost($post, $company),
-                'nav'            => $this->resolveNav($company->id),
+                'company' => $company,
+                'post' => $post,
+                'renderedBlocks' => $this->blockRenderer->render(is_array($post->blocks) ? $post->blocks : []),
+                'seo' => $this->seoMeta->forPost($post, $company),
+                'nav' => $this->resolveNav($company->id),
             ])->render();
         });
 
@@ -80,7 +81,7 @@ final class PublicPostController extends Controller
         return response($html, 200)->header('Content-Type', 'text/html');
     }
 
-    /** @return array{header: list<mixed>, footer: list<mixed>} */
+    /** @return array{header: array, footer: array} */
     private function resolveNav(string $companyId): array
     {
         $rows = CmsNavigation::withoutGlobalScopes()

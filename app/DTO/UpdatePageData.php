@@ -26,7 +26,7 @@ final readonly class UpdatePageData
         return new self(
             title: $request->string('title')->toString(),
             slug: $request->string('slug')->toString(),
-            blocks: $request->array('blocks', []),
+            blocks: (array) $request->input('blocks', []),
             status: $request->string('status', 'draft')->toString(),
             seoTitle: $request->string('seo_title')->toString() ?: null,
             seoDescription: $request->string('seo_description')->toString() ?: null,

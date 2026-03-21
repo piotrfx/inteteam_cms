@@ -9,9 +9,9 @@ use App\Models\CmsNavigation;
 use App\Models\CmsPage;
 use App\Services\BlockRendererService;
 use App\Services\SeoMetaService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\View\View;
 
 final class PublicPageController extends Controller
 {
@@ -20,12 +20,12 @@ final class PublicPageController extends Controller
         private readonly SeoMetaService $seoMeta,
     ) {}
 
-    public function show(string $slug): View|Response
+    public function show(string $slug): Response
     {
         abort_unless(app()->bound('current_company'), 404);
 
         $company = app('current_company');
-        $theme   = $company->theme ?? 'default';
+        $theme = $company->theme ?? 'default';
         $cacheKey = "cms:page:{$company->id}:{$slug}";
 
         $html = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($company, $slug, $theme): ?string {
@@ -35,16 +35,17 @@ final class PublicPageController extends Controller
                 ->where('status', 'published')
                 ->first();
 
-            if (! $page) {
+            if (!$page) {
                 return null;
             }
 
+            // @phpstan-ignore argument.type
             return view("themes.{$theme}.page", [
-                'company'        => $company,
-                'page'           => $page,
-                'renderedBlocks' => $this->blockRenderer->render($page->blocks ?? []),
-                'seo'            => $this->seoMeta->forPage($page, $company),
-                'nav'            => $this->resolveNav($company->id),
+                'company' => $company,
+                'page' => $page,
+                'renderedBlocks' => $this->blockRenderer->render(is_array($page->blocks) ? $page->blocks : []),
+                'seo' => $this->seoMeta->forPage($page, $company),
+                'nav' => $this->resolveNav($company->id),
             ])->render();
         });
 
@@ -55,13 +56,13 @@ final class PublicPageController extends Controller
         return response($html, 200)->header('Content-Type', 'text/html');
     }
 
-    public function home(): View|Response|\Illuminate\Http\RedirectResponse
+    public function home(): Response|RedirectResponse
     {
-        if (! app()->bound('current_company')) {
+        if (!app()->bound('current_company')) {
             return redirect()->route('admin.login');
         }
 
-        $company  = app('current_company');
+        $company = app('current_company');
         $cacheKey = "cms:page:{$company->id}:home";
 
         $html = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($company): ?string {
@@ -71,18 +72,19 @@ final class PublicPageController extends Controller
                 ->where('status', 'published')
                 ->first();
 
-            if (! $page) {
+            if (!$page) {
                 return null;
             }
 
             $theme = $company->theme ?? 'default';
 
+            // @phpstan-ignore argument.type
             return view("themes.{$theme}.page", [
-                'company'        => $company,
-                'page'           => $page,
-                'renderedBlocks' => $this->blockRenderer->render($page->blocks ?? []),
-                'seo'            => $this->seoMeta->forPage($page, $company),
-                'nav'            => $this->resolveNav($company->id),
+                'company' => $company,
+                'page' => $page,
+                'renderedBlocks' => $this->blockRenderer->render(is_array($page->blocks) ? $page->blocks : []),
+                'seo' => $this->seoMeta->forPage($page, $company),
+                'nav' => $this->resolveNav($company->id),
             ])->render();
         });
 
@@ -93,7 +95,7 @@ final class PublicPageController extends Controller
         return response($html, 200)->header('Content-Type', 'text/html');
     }
 
-    /** @return array{header: list<mixed>, footer: list<mixed>} */
+    /** @return array{header: array, footer: array} */
     private function resolveNav(string $companyId): array
     {
         $rows = CmsNavigation::withoutGlobalScopes()

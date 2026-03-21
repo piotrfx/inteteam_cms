@@ -21,6 +21,7 @@ final class PruneOldRevisionsCommand extends Command
         $cutoff = now()->subDays($days);
 
         // Delete expired preview tokens
+        /** @var int $tokenCount */
         $tokenCount = CmsPreviewToken::withoutGlobalScopes()
             ->where('expires_at', '<', now())
             ->delete();
@@ -28,6 +29,7 @@ final class PruneOldRevisionsCommand extends Command
         $this->info("Deleted {$tokenCount} expired preview tokens.");
 
         // Delete old revisions not referenced as live or staged
+        /** @var int $pruned */
         $pruned = CmsPageRevision::withoutGlobalScopes()
             ->where('created_at', '<', $cutoff)
             ->whereNotIn('id', function ($query): void {

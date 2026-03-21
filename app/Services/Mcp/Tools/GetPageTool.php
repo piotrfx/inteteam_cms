@@ -38,8 +38,8 @@ final class GetPageTool implements McpTool
     public function execute(array $input, CmsMcpToken $token): array
     {
         $page = isset($input['id'])
-            ? CmsPage::find($input['id'])
-            : CmsPage::where('slug', $input['slug'] ?? '')->first();
+            ? CmsPage::find(is_string($input['id']) ? $input['id'] : '')
+            : CmsPage::where('slug', is_string($input['slug'] ?? null) ? $input['slug'] : '')->first();
 
         if ($page === null) {
             return ['error' => 'Page not found.'];

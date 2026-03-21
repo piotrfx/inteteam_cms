@@ -32,6 +32,7 @@ final class McpController extends Controller
         }
 
         $id = $body['id'] ?? null;
+        /** @var string $method */
         $method = $body['method'] ?? '';
         $params = $body['params'] ?? [];
 
@@ -83,6 +84,11 @@ final class McpController extends Controller
         }
 
         $tool = McpToolRegistry::get($name);
+
+        if ($tool === null) {
+            return $this->rpcError($id, -32601, "Tool not found: {$name}");
+        }
+
         $token = app('current_mcp_token');
 
         if (!$token instanceof CmsMcpToken) {

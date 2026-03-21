@@ -49,7 +49,7 @@ final class UpdatePostBlocksTool implements McpTool
             return ['error' => 'Write permission required.'];
         }
 
-        $post = CmsPost::find($input['post_id'] ?? '');
+        $post = CmsPost::find(is_string($input['post_id'] ?? null) ? $input['post_id'] : '');
 
         if ($post === null) {
             return ['error' => 'Post not found.'];

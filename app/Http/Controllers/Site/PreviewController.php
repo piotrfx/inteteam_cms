@@ -34,6 +34,7 @@ final class PreviewController extends Controller
             ? "themes.{$theme}.page"
             : "themes.{$theme}.post";
 
+        // @phpstan-ignore argument.type
         $html = view($view, [
             'company' => $company,
             ($content instanceof CmsPage ? 'page' : 'post') => $content,
@@ -55,28 +56,32 @@ final class PreviewController extends Controller
     private function resolveContent(CmsPreviewToken $record): array
     {
         if ($record->content_type === 'page') {
+            /** @var CmsPage $content */
             $content = CmsPage::withoutGlobalScopes()
                 ->with('company')
                 ->findOrFail($record->content_id);
 
+            /** @var Company $company */
             $company = $content->company;
 
             // Use staged blocks from the revision
-            $content->blocks = $record->revision->blocks;
+            $content->blocks = $record->revision !== null ? ($record->revision->blocks ?? []) : [];
 
             $seo = $this->seoMeta->forPage($content, $company);
-            $renderedBlocks = $this->blockRenderer->render($content->blocks ?? []);
+            $renderedBlocks = $this->blockRenderer->render($content->blocks);
         } else {
+            /** @var CmsPost $content */
             $content = CmsPost::withoutGlobalScopes()
                 ->with('company')
                 ->findOrFail($record->content_id);
 
+            /** @var Company $company */
             $company = $content->company;
 
-            $content->blocks = $record->revision->blocks;
+            $content->blocks = $record->revision !== null ? ($record->revision->blocks ?? []) : [];
 
             $seo = $this->seoMeta->forPost($content, $company);
-            $renderedBlocks = $this->blockRenderer->render($content->blocks ?? []);
+            $renderedBlocks = $this->blockRenderer->render($content->blocks);
         }
 
         return [$content, $company, $seo, $renderedBlocks];
@@ -85,7 +90,7 @@ final class PreviewController extends Controller
     private function renderBanner(string $token, CmsPreviewToken $record): string
     {
         $author = $record->revision?->created_by_type === 'ai_agent' ? 'AI Assistant' : 'Editor';
-        $rawSummary = $record->revision?->summary ?? '';
+        $rawSummary = $record->revision !== null ? ($record->revision->summary ?? '') : '';
         $summary = htmlspecialchars($rawSummary, ENT_QUOTES);
         $csrfToken = csrf_token();
         $summaryHtml = $summary !== ''

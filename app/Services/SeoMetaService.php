@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\CmsPage;
 use App\Models\CmsPost;
+use App\Models\CmsUser;
 use App\Models\Company;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,13 +31,13 @@ final class SeoMetaService
             : ($company->seo_og_image_path ? Storage::url($company->seo_og_image_path) : null);
 
         return [
-            'title'       => $title,
+            'title' => $title,
             'description' => $description,
-            'canonical'   => $page->seo_canonical_url ?: url('/' . $page->slug),
-            'robots'      => $page->seo_robots ?: $company->seo_robots ?: 'index,follow',
-            'og_type'     => 'website',
-            'og_image'    => $ogImage,
-            'json_ld'     => $this->pageJsonLd($page, $company, $title, $description),
+            'canonical' => $page->seo_canonical_url ?: url('/' . $page->slug),
+            'robots' => $page->seo_robots ?: $company->seo_robots ?: 'index,follow',
+            'og_type' => 'website',
+            'og_image' => $ogImage,
+            'json_ld' => $this->pageJsonLd($page, $company, $title, $description),
         ];
     }
 
@@ -60,13 +61,13 @@ final class SeoMetaService
             : ($post->featured_image_path ? Storage::url($post->featured_image_path) : null);
 
         return [
-            'title'       => $title,
+            'title' => $title,
             'description' => $description,
-            'canonical'   => url('/blog/' . $post->slug),
-            'robots'      => $post->seo_robots ?: $company->seo_robots ?: 'index,follow',
-            'og_type'     => 'article',
-            'og_image'    => $ogImage,
-            'json_ld'     => $this->postJsonLd($post, $company, $title, $description),
+            'canonical' => url('/blog/' . $post->slug),
+            'robots' => $post->seo_robots ?: $company->seo_robots ?: 'index,follow',
+            'og_type' => 'article',
+            'og_image' => $ogImage,
+            'json_ld' => $this->postJsonLd($post, $company, $title, $description),
         ];
     }
 
@@ -80,13 +81,13 @@ final class SeoMetaService
         $title = 'Blog' . $this->titleSuffix($company);
 
         return [
-            'title'       => $title,
+            'title' => $title,
             'description' => $company->seo_meta_description ?? '',
-            'canonical'   => url('/blog'),
-            'robots'      => $company->seo_robots ?: 'index,follow',
-            'og_type'     => 'website',
-            'og_image'    => $company->seo_og_image_path ? Storage::url($company->seo_og_image_path) : null,
-            'json_ld'     => null,
+            'canonical' => url('/blog'),
+            'robots' => $company->seo_robots ?: 'index,follow',
+            'og_type' => 'website',
+            'og_image' => $company->seo_og_image_path ? Storage::url($company->seo_og_image_path) : null,
+            'json_ld' => null,
         ];
     }
 
@@ -114,11 +115,11 @@ final class SeoMetaService
         $schemaType = $page->seo_schema_type ?: 'WebPage';
 
         $schema = [
-            '@context'    => 'https://schema.org',
-            '@type'       => $schemaType,
-            'name'        => $title,
+            '@context' => 'https://schema.org',
+            '@type' => $schemaType,
+            'name' => $title,
             'description' => $description,
-            'url'         => url('/' . $page->slug),
+            'url' => url('/' . $page->slug),
         ];
 
         return (string) json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -127,16 +128,16 @@ final class SeoMetaService
     private function postJsonLd(CmsPost $post, Company $company, string $title, string $description): string
     {
         $schema = [
-            '@context'         => 'https://schema.org',
-            '@type'            => 'BlogPosting',
-            'headline'         => $title,
-            'description'      => $description,
-            'url'              => url('/blog/' . $post->slug),
-            'datePublished'    => $post->published_at?->toIso8601String(),
-            'dateModified'     => $post->updated_at?->toIso8601String(),
+            '@context' => 'https://schema.org',
+            '@type' => 'BlogPosting',
+            'headline' => $title,
+            'description' => $description,
+            'url' => url('/blog/' . $post->slug),
+            'datePublished' => $post->published_at?->toIso8601String(),
+            'dateModified' => $post->updated_at?->toIso8601String(),
         ];
 
-        if ($post->author) {
+        if ($post->author instanceof CmsUser) {
             $schema['author'] = ['@type' => 'Person', 'name' => $post->author->name];
         }
 
@@ -150,18 +151,18 @@ final class SeoMetaService
     private function localBusinessSchema(Company $company): string
     {
         $schema = array_filter([
-            '@context'    => 'https://schema.org',
-            '@type'       => 'LocalBusiness',
-            'name'        => $company->seo_site_name ?: $company->name,
-            'url'         => url('/'),
-            'telephone'   => $company->seo_phone ?: null,
-            'priceRange'  => $company->seo_price_range ?: null,
-            'address'     => $company->seo_address_street ? [
-                '@type'           => 'PostalAddress',
-                'streetAddress'   => $company->seo_address_street,
+            '@context' => 'https://schema.org',
+            '@type' => 'LocalBusiness',
+            'name' => $company->seo_site_name ?: $company->name,
+            'url' => url('/'),
+            'telephone' => $company->seo_phone ?: null,
+            'priceRange' => $company->seo_price_range ?: null,
+            'address' => $company->seo_address_street ? [
+                '@type' => 'PostalAddress',
+                'streetAddress' => $company->seo_address_street,
                 'addressLocality' => $company->seo_address_city ?: null,
-                'postalCode'      => $company->seo_address_postcode ?: null,
-                'addressCountry'  => 'GB',
+                'postalCode' => $company->seo_address_postcode ?: null,
+                'addressCountry' => 'GB',
             ] : null,
             'openingHoursSpecification' => $this->openingHoursSchema($company),
         ]);
@@ -179,13 +180,13 @@ final class SeoMetaService
         $specs = [];
         foreach ($company->seo_opening_hours as $entry) {
             $specs[] = array_filter([
-                '@type'     => 'OpeningHoursSpecification',
+                '@type' => 'OpeningHoursSpecification',
                 'dayOfWeek' => $entry['day'] ?? null,
-                'opens'     => $entry['opens'] ?? null,
-                'closes'    => $entry['closes'] ?? null,
+                'opens' => $entry['opens'] ?? null,
+                'closes' => $entry['closes'] ?? null,
             ]);
         }
 
-        return $specs ?: null;
+        return $specs !== [] ? $specs : null; // @phpstan-ignore notIdentical.alwaysTrue
     }
 }

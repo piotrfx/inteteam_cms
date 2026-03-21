@@ -38,8 +38,8 @@ final class GetPostTool implements McpTool
     public function execute(array $input, CmsMcpToken $token): array
     {
         $post = isset($input['id'])
-            ? CmsPost::find($input['id'])
-            : CmsPost::where('slug', $input['slug'] ?? '')->first();
+            ? CmsPost::find(is_string($input['id']) ? $input['id'] : '')
+            : CmsPost::where('slug', is_string($input['slug'] ?? null) ? $input['slug'] : '')->first();
 
         if ($post === null) {
             return ['error' => 'Post not found.'];

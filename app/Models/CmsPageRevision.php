@@ -8,7 +8,12 @@ use App\Models\Concerns\HasCompanyScope;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property array|null $blocks
+ * @property Carbon|null $created_at
+ */
 final class CmsPageRevision extends Model
 {
     use HasCompanyScope, HasUlids;

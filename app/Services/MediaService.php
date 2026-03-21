@@ -25,14 +25,16 @@ final class MediaService
     ];
 
     private const MAX_BYTES = 10 * 1024 * 1024;  // 10 MB
+
     private const SVG_MAX_BYTES = 500 * 1024;     // 500 KB
+
     private const THUMB_SIZE = 400;
 
     public function upload(CmsUser $uploader, UploadedFile $file): CmsMedia
     {
         $mime = $file->getMimeType() ?? '';
 
-        if (! in_array($mime, self::ALLOWED_MIMES, true)) {
+        if (!in_array($mime, self::ALLOWED_MIMES, true)) {
             throw new \InvalidArgumentException("File type not allowed: {$mime}");
         }
 
@@ -42,6 +44,7 @@ final class MediaService
             throw new \InvalidArgumentException('File exceeds maximum allowed size.');
         }
 
+        /** @var string $disk */
         $disk = config('cms.media_disk', 'local');
         $companyId = $uploader->company_id;
         $ulid = Str::ulid()->toString();
@@ -93,6 +96,7 @@ final class MediaService
         $media->delete();
     }
 
+    /** @return LengthAwarePaginator<int, CmsMedia> */
     public function paginate(string $companyId, ?string $search, int $perPage = 40): LengthAwarePaginator
     {
         return CmsMedia::withoutGlobalScopes()
@@ -119,7 +123,7 @@ final class MediaService
         }
 
         try {
-            $manager = new ImageManager(new Driver());
+            $manager = new ImageManager(new Driver);
             $content = Storage::disk($disk)->get($originalPath);
 
             if ($content === null) {

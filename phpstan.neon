@@ -12,6 +12,8 @@ parameters:
     ignoreErrors:
         # PHPStan 2.x equivalent of checkMissingIterableValueType: false
         - identifier: missingType.iterableValue
+        # BelongsTo/HasMany TDeclaringModel is not covariant; generics on relations cause return.type errors
+        - identifier: missingType.generics
 
     # Disable bleeding-edge until all classes are in place
     # phpVersion: 80400

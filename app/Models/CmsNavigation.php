@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property array|null $items
+ */
 final class CmsNavigation extends Model
 {
     use HasCompanyScope, HasUlids;

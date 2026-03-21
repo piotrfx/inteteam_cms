@@ -14,6 +14,7 @@ final class ResolveTenant
     public function handle(Request $request, Closure $next): Response
     {
         $host = $request->getHost();
+        /** @var string $cmsDomain */
         $cmsDomain = config('cms.domain', 'cms.inte.team');
 
         // Extract slug from {slug}.cms.inte.team

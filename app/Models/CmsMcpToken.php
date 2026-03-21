@@ -8,7 +8,15 @@ use App\Models\Concerns\HasCompanyScope;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property array $permissions
+ * @property Carbon|null $last_used_at
+ * @property Carbon|null $expires_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $revoked_at
+ */
 final class CmsMcpToken extends Model
 {
     use HasCompanyScope, HasUlids;

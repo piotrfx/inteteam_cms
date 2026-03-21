@@ -11,6 +11,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string|null $seo_robots
+ * @property string|null $seo_site_name
+ * @property string|null $seo_meta_description
+ * @property string|null $seo_og_image_path
+ * @property string|null $seo_title_suffix
+ * @property string|null $seo_address_street
+ * @property string|null $seo_address_city
+ * @property string|null $seo_address_postcode
+ * @property string|null $seo_phone
+ * @property string|null $seo_price_range
+ * @property array|null $seo_opening_hours
+ */
 final class Company extends Model
 {
     /** @use HasFactory<CompanyFactory> */

@@ -21,7 +21,7 @@ final class StagedController extends Controller
     public function publishPage(CmsPage $page): RedirectResponse
     {
         abort_unless(auth('cms')->user()?->role === 'admin', 403);
-        abort_unless(auth('cms')->user()?->company_id === $page->company_id, 403);
+        abort_unless(auth('cms')->user()->company_id === $page->company_id, 403);
 
         $this->revisionService->publishStaged($page);
 
@@ -31,7 +31,7 @@ final class StagedController extends Controller
     public function discardPage(CmsPage $page): RedirectResponse
     {
         abort_unless(auth('cms')->user()?->role === 'admin', 403);
-        abort_unless(auth('cms')->user()?->company_id === $page->company_id, 403);
+        abort_unless(auth('cms')->user()->company_id === $page->company_id, 403);
 
         $this->revisionService->discardStaged($page);
 
@@ -51,7 +51,7 @@ final class StagedController extends Controller
     public function publishPost(CmsPost $post): RedirectResponse
     {
         abort_unless(auth('cms')->user()?->role === 'admin', 403);
-        abort_unless(auth('cms')->user()?->company_id === $post->company_id, 403);
+        abort_unless(auth('cms')->user()->company_id === $post->company_id, 403);
 
         $this->revisionService->publishStaged($post);
 
@@ -61,7 +61,7 @@ final class StagedController extends Controller
     public function discardPost(CmsPost $post): RedirectResponse
     {
         abort_unless(auth('cms')->user()?->role === 'admin', 403);
-        abort_unless(auth('cms')->user()?->company_id === $post->company_id, 403);
+        abort_unless(auth('cms')->user()->company_id === $post->company_id, 403);
 
         $this->revisionService->discardStaged($post);
 

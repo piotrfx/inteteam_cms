@@ -40,7 +40,7 @@ final class UpdatePageSeoTool implements McpTool
             return ['error' => 'Write permission required.'];
         }
 
-        $page = CmsPage::find($input['page_id'] ?? '');
+        $page = CmsPage::find(is_string($input['page_id'] ?? null) ? $input['page_id'] : '');
 
         if ($page === null) {
             return ['error' => 'Page not found.'];

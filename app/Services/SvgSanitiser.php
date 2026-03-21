@@ -18,14 +18,20 @@ final class SvgSanitiser
 
     public static function sanitise(string $svg): string
     {
-        $dom = new \DOMDocument();
+        $dom = new \DOMDocument;
 
         // Suppress warnings from malformed XML
         $prev = libxml_use_internal_errors(true);
         $dom->loadXML($svg, LIBXML_NONET | LIBXML_NOBLANKS);
         libxml_use_internal_errors($prev);
 
-        self::walkNode($dom->documentElement);
+        $root = $dom->documentElement;
+
+        if ($root === null) {
+            return '';
+        }
+
+        self::walkNode($root);
 
         $sanitised = $dom->saveXML($dom->documentElement);
 
@@ -47,6 +53,7 @@ final class SvgSanitiser
                 if (in_array($tag, self::BANNED_TAGS, true)) {
                     $toRemove[] = $child;
                 } else {
+                    /** @var \DOMElement $child */
                     self::stripAttributes($child);
                     self::walkNode($child);
                 }

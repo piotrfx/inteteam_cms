@@ -28,7 +28,7 @@ final readonly class CreatePostData
             title: $request->string('title')->toString(),
             slug: $request->string('slug')->toString(),
             excerpt: $request->string('excerpt')->toString() ?: null,
-            blocks: $request->array('blocks', []),
+            blocks: (array) $request->input('blocks', []),
             status: $request->string('status', 'draft')->toString(),
             featuredImagePath: $request->string('featured_image_path')->toString() ?: null,
             seoTitle: $request->string('seo_title')->toString() ?: null,

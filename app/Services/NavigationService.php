@@ -10,8 +10,6 @@ final class NavigationService
 {
     /**
      * Get navigation for a location, or null if none saved.
-     *
-     * @return list<array{label: string, url: string, target?: string}>|null
      */
     public function get(string $companyId, string $location): ?array
     {
@@ -25,8 +23,6 @@ final class NavigationService
 
     /**
      * Save (upsert) navigation items for a location.
-     *
-     * @param  list<array{label: string, url: string, target?: string}>  $items
      */
     public function save(string $companyId, string $location, array $items): CmsNavigation
     {

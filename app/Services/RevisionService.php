@@ -143,12 +143,12 @@ final class RevisionService
 
     public function rollBackTo(CmsPage|CmsPost $content, CmsPageRevision $revision): CmsPageRevision
     {
-        $summary = "Rolled back to revision from {$revision->created_at?->toDateTimeString()}";
+        $summary = 'Rolled back to revision from ' . ($revision->created_at?->toDateTimeString() ?? 'unknown date');
 
         if ($content instanceof CmsPage) {
             return $this->stagePageRevision(
                 page: $content,
-                blocks: $revision->blocks,
+                blocks: $revision->blocks ?? [],
                 summary: $summary,
                 createdByType: 'user',
                 createdById: $content->created_by ?? null,
@@ -157,7 +157,7 @@ final class RevisionService
 
         return $this->stagePostRevision(
             post: $content,
-            blocks: $revision->blocks,
+            blocks: $revision->blocks ?? [],
             summary: $summary,
             createdByType: 'user',
         );

@@ -40,7 +40,7 @@ final class AppServiceProvider extends ServiceProvider
         // Bind BlockRendererService — resolves active theme + CRM factory from current company if bound
         $this->app->bind(BlockRendererService::class, function (): BlockRendererService {
             $company = app()->bound('current_company') ? app('current_company') : null;
-            $theme = $company?->theme ?? 'default';
+            $theme = $company !== null ? $company->theme ?? 'default' : 'default';
 
             return new BlockRendererService(
                 theme: $theme,

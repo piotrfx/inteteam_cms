@@ -13,6 +13,7 @@ use App\Services\MediaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +23,7 @@ final class MediaController extends Controller
 
     public function index(Request $request): Response
     {
-        abort_unless(auth('cms')->user()?->can('viewAny', CmsMedia::class), 403);
+        abort_unless((bool) auth('cms')->user()?->can('viewAny', CmsMedia::class), 403);
 
         $company = app('current_company');
         $media = $this->mediaService->paginate(
@@ -38,7 +39,7 @@ final class MediaController extends Controller
 
     public function store(StoreMediaRequest $request): JsonResponse
     {
-        abort_unless(auth('cms')->user()?->can('create', CmsMedia::class), 403);
+        abort_unless((bool) auth('cms')->user()?->can('create', CmsMedia::class), 403);
 
         try {
             $media = $this->mediaService->upload(
@@ -54,7 +55,7 @@ final class MediaController extends Controller
 
     public function update(UpdateMediaRequest $request, CmsMedia $media): RedirectResponse
     {
-        abort_unless(auth('cms')->user()?->can('update', $media), 403);
+        abort_unless((bool) auth('cms')->user()?->can('update', $media), 403);
 
         $this->mediaService->update($media, UpdateMediaData::fromRequest($request));
 
@@ -63,7 +64,7 @@ final class MediaController extends Controller
 
     public function destroy(CmsMedia $media): RedirectResponse
     {
-        abort_unless(auth('cms')->user()?->can('delete', $media), 403);
+        abort_unless((bool) auth('cms')->user()?->can('delete', $media), 403);
 
         $this->mediaService->delete($media);
 
@@ -74,7 +75,7 @@ final class MediaController extends Controller
     /** @return array<string, mixed> */
     private function toArray(CmsMedia $media): array
     {
-        $disk = \Illuminate\Support\Facades\Storage::disk($media->disk);
+        $disk = Storage::disk($media->disk);
         $url = $disk->url($media->path);
         $thumbPath = str_replace('.' . pathinfo($media->path, PATHINFO_EXTENSION), '_thumb.' . pathinfo($media->path, PATHINFO_EXTENSION), $media->path);
         $thumbUrl = $disk->exists($thumbPath) ? $disk->url($thumbPath) : $url;

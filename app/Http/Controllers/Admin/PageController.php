@@ -21,7 +21,7 @@ final class PageController extends Controller
 
     public function index(): Response
     {
-        abort_unless(auth('cms')->user()?->can('viewAny', CmsPage::class), 403);
+        abort_unless((bool) auth('cms')->user()?->can('viewAny', CmsPage::class), 403);
 
         $pages = CmsPage::orderByDesc('created_at')
             ->get(['id', 'title', 'slug', 'type', 'status', 'published_at', 'created_at']);
@@ -33,14 +33,14 @@ final class PageController extends Controller
 
     public function create(): Response
     {
-        abort_unless(auth('cms')->user()?->can('create', CmsPage::class), 403);
+        abort_unless((bool) auth('cms')->user()?->can('create', CmsPage::class), 403);
 
         return Inertia::render('Admin/Pages/Create');
     }
 
     public function store(StorePageRequest $request): RedirectResponse
     {
-        abort_unless(auth('cms')->user()?->can('create', CmsPage::class), 403);
+        abort_unless((bool) auth('cms')->user()?->can('create', CmsPage::class), 403);
 
         try {
             $page = $this->pageService->create(
@@ -57,7 +57,7 @@ final class PageController extends Controller
 
     public function edit(CmsPage $page): Response
     {
-        abort_unless(auth('cms')->user()?->can('update', $page), 403);
+        abort_unless((bool) auth('cms')->user()?->can('update', $page), 403);
 
         return Inertia::render('Admin/Pages/Edit', [
             'page' => $page,
@@ -66,7 +66,7 @@ final class PageController extends Controller
 
     public function update(UpdatePageRequest $request, CmsPage $page): RedirectResponse
     {
-        abort_unless(auth('cms')->user()?->can('update', $page), 403);
+        abort_unless((bool) auth('cms')->user()?->can('update', $page), 403);
 
         $this->pageService->update($page, UpdatePageData::fromRequest($request));
 
@@ -75,7 +75,7 @@ final class PageController extends Controller
 
     public function destroy(CmsPage $page): RedirectResponse
     {
-        abort_unless(auth('cms')->user()?->can('delete', $page), 403);
+        abort_unless((bool) auth('cms')->user()?->can('delete', $page), 403);
 
         $this->pageService->delete($page);
 
@@ -85,7 +85,7 @@ final class PageController extends Controller
 
     public function publish(CmsPage $page): RedirectResponse
     {
-        abort_unless(auth('cms')->user()?->can('publish', $page), 403);
+        abort_unless((bool) auth('cms')->user()?->can('publish', $page), 403);
 
         $this->pageService->publish($page);
 
@@ -94,7 +94,7 @@ final class PageController extends Controller
 
     public function unpublish(CmsPage $page): RedirectResponse
     {
-        abort_unless(auth('cms')->user()?->can('publish', $page), 403);
+        abort_unless((bool) auth('cms')->user()?->can('publish', $page), 403);
 
         $this->pageService->unpublish($page);
 

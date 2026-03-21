@@ -32,6 +32,7 @@ final class ResetPasswordController extends Controller
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
+        /** @var string $status */
         $status = Password::broker('cms_users')->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, string $password): void {

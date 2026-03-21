@@ -8,7 +8,12 @@ use App\Models\Concerns\HasCompanyScope;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property Carbon $expires_at
+ * @property CmsPageRevision|null $revision
+ */
 final class CmsPreviewToken extends Model
 {
     use HasCompanyScope, HasUlids;

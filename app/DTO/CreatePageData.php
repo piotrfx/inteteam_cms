@@ -28,7 +28,7 @@ final readonly class CreatePageData
             title: $request->string('title')->toString(),
             slug: $request->string('slug')->toString(),
             type: $request->string('type', 'custom')->toString(),
-            blocks: $request->array('blocks', []),
+            blocks: (array) $request->input('blocks', []),
             status: $request->string('status', 'draft')->toString(),
             seoTitle: $request->string('seo_title')->toString() ?: null,
             seoDescription: $request->string('seo_description')->toString() ?: null,
