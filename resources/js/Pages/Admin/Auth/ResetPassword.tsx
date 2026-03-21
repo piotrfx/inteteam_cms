@@ -1,25 +1,30 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 
-export default function Login() {
+interface Props {
+    token: string;
+    email: string;
+}
+
+export default function ResetPassword({ token, email }: Props) {
     const { data, setData, post, processing, errors } = useForm({
-        email: '',
+        token,
+        email,
         password: '',
-        remember: false,
+        password_confirmation: '',
     });
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        post(route('admin.login.attempt'));
+        post(route('admin.password.update'));
     }
 
     return (
         <>
-            <Head title="Sign in" />
+            <Head title="Reset password" />
             <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4">
                 <div className="w-full max-w-sm space-y-6">
                     <div className="text-center">
-                        <h1 className="text-2xl font-bold tracking-tight">Inte.Team CMS</h1>
-                        <p className="mt-1 text-sm text-zinc-500">Sign in to your account</p>
+                        <h1 className="text-2xl font-bold tracking-tight">Set new password</h1>
                     </div>
 
                     <form onSubmit={submit} className="space-y-4">
@@ -41,21 +46,13 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <div className="flex items-center justify-between mb-1">
-                                <label htmlFor="password" className="block text-sm font-medium">
-                                    Password
-                                </label>
-                                <Link
-                                    href={route('admin.password.request')}
-                                    className="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400"
-                                >
-                                    Forgot password?
-                                </Link>
-                            </div>
+                            <label htmlFor="password" className="block text-sm font-medium mb-1">
+                                New password
+                            </label>
                             <input
                                 id="password"
                                 type="password"
-                                autoComplete="current-password"
+                                autoComplete="new-password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
@@ -65,22 +62,26 @@ export default function Login() {
                             )}
                         </div>
 
-                        <label className="flex items-center gap-2 text-sm">
+                        <div>
+                            <label htmlFor="password_confirmation" className="block text-sm font-medium mb-1">
+                                Confirm password
+                            </label>
                             <input
-                                type="checkbox"
-                                checked={data.remember}
-                                onChange={(e) => setData('remember', e.target.checked)}
-                                className="rounded border-zinc-300"
+                                id="password_confirmation"
+                                type="password"
+                                autoComplete="new-password"
+                                value={data.password_confirmation}
+                                onChange={(e) => setData('password_confirmation', e.target.value)}
+                                className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                             />
-                            Remember me
-                        </label>
+                        </div>
 
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50"
+                            className="w-full rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
                         >
-                            {processing ? 'Signing in…' : 'Sign in'}
+                            {processing ? 'Saving…' : 'Reset password'}
                         </button>
                     </form>
                 </div>
