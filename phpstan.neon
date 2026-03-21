@@ -1,0 +1,17 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 9
+
+    paths:
+        - app
+        - database/factories
+        - database/seeders
+
+    ignoreErrors: []
+
+    # Disable bleeding-edge until all classes are in place
+    # phpVersion: 80400
+
+    checkMissingIterableValueType: false

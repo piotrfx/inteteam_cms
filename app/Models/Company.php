@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+final class Company extends Model
+{
+    /** @use HasFactory<\Database\Factories\CompanyFactory> */
+    use HasFactory, HasUlids, SoftDeletes;
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'domain',
+        'logo_path',
+        'favicon_path',
+        'crm_base_url',
+        'crm_company_id',
+        'crm_api_key',
+        'seo_site_name',
+        'seo_title_suffix',
+        'seo_meta_description',
+        'seo_og_image_path',
+        'seo_twitter_handle',
+        'seo_google_verification',
+        'seo_robots',
+        'seo_address_street',
+        'seo_address_city',
+        'seo_address_postcode',
+        'seo_phone',
+        'seo_opening_hours',
+        'seo_price_range',
+        'primary_colour',
+        'theme',
+        'settings',
+        'plan',
+        'is_active',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'seo_opening_hours' => 'array',
+            'settings' => 'array',
+            'is_active' => 'boolean',
+        ];
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(CmsUser::class);
+    }
+}
