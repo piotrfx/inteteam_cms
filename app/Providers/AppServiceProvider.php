@@ -13,6 +13,23 @@ use App\Policies\CmsPostPolicy;
 use App\Services\BlockRendererService;
 use App\Services\BlockTypeRegistry;
 use App\Services\CrmApiClientFactory;
+use App\Services\Mcp\McpToolRegistry;
+use App\Services\Mcp\Tools\CreatePageTool;
+use App\Services\Mcp\Tools\CreatePostTool;
+use App\Services\Mcp\Tools\CreatePreviewTool;
+use App\Services\Mcp\Tools\DiscardStagedTool;
+use App\Services\Mcp\Tools\GetNavigationTool;
+use App\Services\Mcp\Tools\GetPageTool;
+use App\Services\Mcp\Tools\GetPostTool;
+use App\Services\Mcp\Tools\GetSiteSettingsTool;
+use App\Services\Mcp\Tools\ListMediaTool;
+use App\Services\Mcp\Tools\ListPagesTool;
+use App\Services\Mcp\Tools\ListPostsTool;
+use App\Services\Mcp\Tools\PublishStagedTool;
+use App\Services\Mcp\Tools\UpdateNavigationTool;
+use App\Services\Mcp\Tools\UpdatePageBlocksTool;
+use App\Services\Mcp\Tools\UpdatePageSeoTool;
+use App\Services\Mcp\Tools\UpdatePostBlocksTool;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -53,5 +70,28 @@ final class AppServiceProvider extends ServiceProvider
         BlockTypeRegistry::register('storefront', 'Storefront', '🛒', crm: true);
         BlockTypeRegistry::register('crm_form', 'Embedded Form', '📋', crm: true);
         BlockTypeRegistry::register('business_updates', 'Business Updates', '📢', crm: true);
+
+        // ── MCP tool registry ─────────────────────────────────────────────────
+        // Read tools
+        McpToolRegistry::register(app(ListPagesTool::class));
+        McpToolRegistry::register(app(GetPageTool::class));
+        McpToolRegistry::register(app(ListPostsTool::class));
+        McpToolRegistry::register(app(GetPostTool::class));
+        McpToolRegistry::register(app(ListMediaTool::class));
+        McpToolRegistry::register(app(GetNavigationTool::class));
+        McpToolRegistry::register(app(GetSiteSettingsTool::class));
+
+        // Write tools
+        McpToolRegistry::register(app(UpdatePageBlocksTool::class));
+        McpToolRegistry::register(app(UpdatePageSeoTool::class));
+        McpToolRegistry::register(app(CreatePageTool::class));
+        McpToolRegistry::register(app(UpdatePostBlocksTool::class));
+        McpToolRegistry::register(app(CreatePostTool::class));
+        McpToolRegistry::register(app(UpdateNavigationTool::class));
+
+        // Preview / publish tools
+        McpToolRegistry::register(app(CreatePreviewTool::class));
+        McpToolRegistry::register(app(PublishStagedTool::class));
+        McpToolRegistry::register(app(DiscardStagedTool::class));
     }
 }

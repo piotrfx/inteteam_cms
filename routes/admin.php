@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\CrmSettingsController;
+use App\Http\Controllers\Admin\McpTokenController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NavigationController;
 use App\Http\Controllers\Admin\PageController;
@@ -100,4 +101,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:cms')->group(function (
     Route::get('settings/crm', [CrmSettingsController::class, 'show'])->name('settings.crm');
     Route::post('settings/crm', [CrmSettingsController::class, 'update'])->name('settings.crm.update');
     Route::post('settings/crm/test', [CrmSettingsController::class, 'testConnection'])->name('settings.crm.test');
+
+    // AI / MCP token management
+    Route::get('settings/ai', [McpTokenController::class, 'index'])->name('settings.ai');
+    Route::post('settings/ai/tokens', [McpTokenController::class, 'store'])->name('settings.ai.tokens.store');
+    Route::post('settings/ai/tokens/{token}/revoke', [McpTokenController::class, 'revoke'])->name('settings.ai.tokens.revoke');
 });
