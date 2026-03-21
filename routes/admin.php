@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\ResetPasswordController;
+use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,14 +32,47 @@ Route::prefix('admin')->name('admin.')->middleware('guest:cms')->group(function 
         ->name('password.update');
 });
 
-// ── Logout (auth only) ────────────────────────────────────────────────────
+// ── Logout ────────────────────────────────────────────────────────────────
 Route::post('admin/logout', [LoginController::class, 'logout'])
     ->name('admin.logout')
     ->middleware('auth:cms');
 
 // ── Authenticated admin panel ─────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->middleware('auth:cms')->group(function (): void {
+
     Route::get('dashboard', function () {
         return inertia('Admin/Dashboard');
     })->name('dashboard');
+
+    // Media
+    Route::get('media', [MediaController::class, 'index'])->name('media.index');
+    Route::post('media', [MediaController::class, 'store'])->name('media.store');
+    Route::patch('media/{media}', [MediaController::class, 'update'])->name('media.update');
+    Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+
+    // Pages
+    Route::get('pages', [PageController::class, 'index'])->name('pages.index');
+    Route::get('pages/create', [PageController::class, 'create'])->name('pages.create');
+    Route::post('pages', [PageController::class, 'store'])->name('pages.store');
+    Route::get('pages/{page}/edit', [PageController::class, 'edit'])->name('pages.edit');
+    Route::match(['PUT', 'POST'], 'pages/{page}', [PageController::class, 'update'])->name('pages.update');
+    Route::delete('pages/{page}', [PageController::class, 'destroy'])->name('pages.destroy');
+    Route::post('pages/{page}/publish', [PageController::class, 'publish'])->name('pages.publish');
+    Route::post('pages/{page}/unpublish', [PageController::class, 'unpublish'])->name('pages.unpublish');
+
+    // Posts
+    Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+    Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::match(['PUT', 'POST'], 'posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
+    Route::post('posts/{post}/unpublish', [PostController::class, 'unpublish'])->name('posts.unpublish');
+
+    // Navigation (stub — full feature next sprint)
+    Route::get('navigation', fn () => inertia('Admin/Navigation/Index'))->name('navigation.index');
+
+    // Settings (stub — full feature next sprint)
+    Route::get('settings', fn () => inertia('Admin/Settings/Index'))->name('settings.index');
 });

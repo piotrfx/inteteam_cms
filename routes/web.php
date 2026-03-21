@@ -8,3 +8,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('admin.login');
 });
+
+// Named alias so Laravel's auth middleware redirect works
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
