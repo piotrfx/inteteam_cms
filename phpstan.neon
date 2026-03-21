@@ -9,9 +9,9 @@ parameters:
         - database/factories
         - database/seeders
 
-    ignoreErrors: []
+    ignoreErrors:
+        # PHPStan 2.x equivalent of checkMissingIterableValueType: false
+        - identifier: missingType.iterableValue
 
     # Disable bleeding-edge until all classes are in place
     # phpVersion: 80400
-
-    checkMissingIterableValueType: false

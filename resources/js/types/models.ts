@@ -12,6 +12,16 @@ export interface Media {
     created_at: string;
 }
 
+export interface Revision {
+    id: string;
+    summary: string | null;
+    created_by_type: 'user' | 'ai_agent';
+    created_by_id: string | null;
+    created_at: string;
+    is_live: boolean;
+    is_staged: boolean;
+}
+
 export interface CmsPage {
     id: string;
     title: string;
@@ -20,6 +30,8 @@ export interface CmsPage {
     blocks: Block[];
     status: 'draft' | 'published';
     published_at: string | null;
+    live_revision_id: string | null;
+    staged_revision_id: string | null;
     seo_title: string | null;
     seo_description: string | null;
     seo_og_image_path: string | null;
@@ -39,6 +51,8 @@ export interface CmsPost {
     status: 'draft' | 'published' | 'scheduled';
     published_at: string | null;
     featured_image_path: string | null;
+    live_revision_id: string | null;
+    staged_revision_id: string | null;
     seo_title: string | null;
     seo_description: string | null;
     seo_og_image_path: string | null;

@@ -175,6 +175,44 @@ export default function PagesEdit({ page }: Props) {
                             )}
                         </div>
 
+                        {/* Staged revision panel */}
+                        {page.staged_revision_id && (
+                            <div className="rounded-xl border border-indigo-300 dark:border-indigo-700 p-4 space-y-2 bg-indigo-50 dark:bg-indigo-900/20">
+                                <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">⚡ Staged Changes</p>
+                                <p className="text-xs text-indigo-600 dark:text-indigo-400">There are unpublished changes staged for this page.</p>
+                                <a
+                                    href={route('admin.pages.staged.preview', page.id)}
+                                    className="block w-full text-center rounded-lg bg-indigo-600 text-white px-4 py-2 text-sm font-medium hover:bg-indigo-700 transition-colors"
+                                >
+                                    Preview
+                                </a>
+                                <button
+                                    type="button"
+                                    onClick={() => router.post(route('admin.pages.staged.publish', page.id))}
+                                    className="w-full rounded-lg border border-green-500 text-green-600 dark:text-green-400 px-4 py-2 text-sm font-medium hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
+                                >
+                                    Publish Staged
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => router.post(route('admin.pages.staged.discard', page.id))}
+                                    className="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 text-zinc-500 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                >
+                                    Discard Staged
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Revision history link */}
+                        <div className="text-center">
+                            <a
+                                href={route('admin.pages.revisions', page.id)}
+                                className="text-xs text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                            >
+                                View revision history →
+                            </a>
+                        </div>
+
                         {/* Danger */}
                         <div className="rounded-xl border border-red-200 dark:border-red-900/50 p-4">
                             <p className="text-xs font-medium text-red-500 mb-3">Danger Zone</p>

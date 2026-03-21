@@ -5,11 +5,14 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\ResetPasswordController;
+use App\Http\Controllers\Admin\CrmSettingsController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NavigationController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\RevisionController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\StagedController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,6 +75,19 @@ Route::prefix('admin')->name('admin.')->middleware('auth:cms')->group(function (
     Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
     Route::post('posts/{post}/unpublish', [PostController::class, 'unpublish'])->name('posts.unpublish');
 
+    // Revisions + staged actions
+    Route::get('pages/{page}/revisions', [RevisionController::class, 'pageIndex'])->name('pages.revisions');
+    Route::post('pages/{page}/revisions/{revision}/restore', [RevisionController::class, 'restorePage'])->name('pages.revisions.restore');
+    Route::post('pages/{page}/staged/publish', [StagedController::class, 'publishPage'])->name('pages.staged.publish');
+    Route::post('pages/{page}/staged/discard', [StagedController::class, 'discardPage'])->name('pages.staged.discard');
+    Route::get('pages/{page}/staged/preview', [StagedController::class, 'previewPage'])->name('pages.staged.preview');
+
+    Route::get('posts/{post}/revisions', [RevisionController::class, 'postIndex'])->name('posts.revisions');
+    Route::post('posts/{post}/revisions/{revision}/restore', [RevisionController::class, 'restorePost'])->name('posts.revisions.restore');
+    Route::post('posts/{post}/staged/publish', [StagedController::class, 'publishPost'])->name('posts.staged.publish');
+    Route::post('posts/{post}/staged/discard', [StagedController::class, 'discardPost'])->name('posts.staged.discard');
+    Route::get('posts/{post}/staged/preview', [StagedController::class, 'previewPost'])->name('posts.staged.preview');
+
     // Navigation
     Route::get('navigation', [NavigationController::class, 'index'])->name('navigation.index');
     Route::post('navigation', [NavigationController::class, 'update'])->name('navigation.update');
@@ -79,4 +95,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth:cms')->group(function (
     // Settings
     Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingsController::class, 'update'])->name('settings.update');
+
+    // CRM Integration
+    Route::get('settings/crm', [CrmSettingsController::class, 'show'])->name('settings.crm');
+    Route::post('settings/crm', [CrmSettingsController::class, 'update'])->name('settings.crm.update');
+    Route::post('settings/crm/test', [CrmSettingsController::class, 'testConnection'])->name('settings.crm.test');
 });

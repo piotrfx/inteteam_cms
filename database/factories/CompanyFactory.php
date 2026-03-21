@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Crypt;
 
 /**
  * @extends Factory<Company>
@@ -45,5 +46,14 @@ final class CompanyFactory extends Factory
     public function withDomain(string $domain): static
     {
         return $this->state(['domain' => $domain]);
+    }
+
+    public function withCrm(string $baseUrl = 'https://crm.test', string $companyId = 'comp-1', string $apiKey = 'test-key'): static
+    {
+        return $this->state([
+            'crm_base_url' => $baseUrl,
+            'crm_company_id' => $companyId,
+            'crm_api_key' => Crypt::encryptString($apiKey),
+        ]);
     }
 }

@@ -10,28 +10,40 @@ namespace App\Services;
  */
 final class BlockTypeRegistry
 {
-    /** @var array<string, array{label: string, icon: string}> */
+    /** @var array<string, array{label: string, icon: string, crm: bool}> */
     private static array $types = [];
 
-    public static function register(string $type, string $label, string $icon = '□'): void
+    public static function register(string $type, string $label, string $icon = '□', bool $crm = false): void
     {
-        static::$types[$type] = ['label' => $label, 'icon' => $icon];
+        self::$types[$type] = ['label' => $label, 'icon' => $icon, 'crm' => $crm];
     }
 
-    /** @return array<string, array{label: string, icon: string}> */
+    /** @return array<string, array{label: string, icon: string, crm: bool}> */
     public static function all(): array
     {
-        return static::$types;
+        return self::$types;
+    }
+
+    /** @return array<string, array{label: string, icon: string, crm: bool}> */
+    public static function local(): array
+    {
+        return array_filter(self::$types, fn ($t) => !$t['crm']);
+    }
+
+    /** @return array<string, array{label: string, icon: string, crm: bool}> */
+    public static function crm(): array
+    {
+        return array_filter(self::$types, fn ($t) => $t['crm']);
     }
 
     public static function has(string $type): bool
     {
-        return isset(static::$types[$type]);
+        return isset(self::$types[$type]);
     }
 
     /** @return list<string> */
     public static function types(): array
     {
-        return array_keys(static::$types);
+        return array_keys(self::$types);
     }
 }
