@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateSettingsRequest;
+use App\Models\Company;
+use App\Services\MediaService;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
+
+final class SettingsController extends Controller
+{
+    public function __construct(private readonly MediaService $mediaService) {}
+
+    public function index(): Response
+    {
+        abort_unless(auth('cms')->user()?->role === 'admin', 403);
+
+        /** @var Company $company */
+        $company = app('current_company');
+
+        return Inertia::render('Admin/Settings/Index', [
+            'company' => [
+                'name'                    => $company->name,
+                'primary_colour'          => $company->primary_colour ?? '#4f46e5',
+                'theme'                   => $company->theme ?? 'default',
+                'logo_path'               => $company->logo_path,
+                'favicon_path'            => $company->favicon_path,
+                'seo_site_name'           => $company->seo_site_name,
+                'seo_title_suffix'        => $company->seo_title_suffix,
+                'seo_meta_description'    => $company->seo_meta_description,
+                'seo_robots'              => $company->seo_robots ?? 'index',
+                'seo_google_verification' => $company->seo_google_verification,
+                'seo_twitter_handle'      => $company->seo_twitter_handle,
+                'seo_address_street'      => $company->seo_address_street,
+                'seo_address_city'        => $company->seo_address_city,
+                'seo_address_postcode'    => $company->seo_address_postcode,
+                'seo_phone'               => $company->seo_phone,
+                'seo_price_range'         => $company->seo_price_range,
+            ],
+        ]);
+    }
+
+    public function update(UpdateSettingsRequest $request): RedirectResponse
+    {
+        abort_unless(auth('cms')->user()?->role === 'admin', 403);
+
+        /** @var Company $company */
+        $company = app('current_company');
+
+        $company->update($request->validated());
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $media = $this->mediaService->upload(auth('cms')->user(), $request->file('logo'));
+            $company->update(['logo_path' => $media->path]);
+        }
+
+        // Handle favicon upload
+        if ($request->hasFile('favicon')) {
+            $media = $this->mediaService->upload(auth('cms')->user(), $request->file('favicon'));
+            $company->update(['favicon_path' => $media->path]);
+        }
+
+        return back()->with(['alert' => 'Settings saved.', 'type' => 'success']);
+    }
+}

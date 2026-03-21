@@ -1,6 +1,6 @@
 # Navigation Feature
 
-**Status:** Phase 1
+**Status:** Phase 1 — ✅ Implemented
 
 ---
 
@@ -79,12 +79,11 @@ Each item in the `items` array:
 ## Routes (`routes/admin.php`)
 
 ```
-GET   /admin/navigation          → Admin\NavigationController::index
-POST  /admin/navigation/header   → Admin\NavigationController::updateHeader
-POST  /admin/navigation/footer   → Admin\NavigationController::updateFooter
+GET   /admin/navigation   → Admin\NavigationController::index   (name: admin.navigation.index)
+POST  /admin/navigation   → Admin\NavigationController::update  (name: admin.navigation.update)
 ```
 
-Both `updateHeader` and `updateFooter` receive the full `items` array and replace the existing record (upsert). Single-operation save — no per-item CRUD.
+The `update` action receives `{location: 'header'|'footer', items: NavItem[]}` and upserts that location. One POST per menu; no per-item CRUD.
 
 ---
 
@@ -93,14 +92,12 @@ Both `updateHeader` and `updateFooter` receive the full `items` array and replac
 ```php
 final class NavigationService
 {
-    public function getHeader(string $companyId): array;
-    public function getFooter(string $companyId): array;
-    public function saveHeader(string $companyId, array $items): CmsNavigation;
-    public function saveFooter(string $companyId, array $items): CmsNavigation;
+    public function get(string $companyId, string $location): array;
+    public function save(string $companyId, string $location, array $items): CmsNavigation;
 }
 ```
 
-`save*` methods validate the items array (depth, count, URL format) then upsert.
+`save()` upserts the row by `(company_id, location)`. Phase 1 — no depth/count validation yet.
 
 ---
 
@@ -108,14 +105,15 @@ final class NavigationService
 
 ```
 resources/js/Pages/Admin/Navigation/
-└── Index.tsx   -- two tabs: Header / Footer, each with a drag-drop menu builder
+└── Index.tsx   -- two NavEditor panels (header + footer), each independently saveable
 ```
 
-Menu builder:
-- List of current items with drag handles and edit/delete icons
-- "Add item" button opens an inline form: label, URL, target (checkbox for new tab)
-- Drag to reorder and drag into a top-level item to nest (one level only)
-- Save button submits the full items array
+`NavEditor` component:
+- Flat item list (no nested children in Phase 1)
+- Each item: Label input, URL input, Same/New tab select, ✕ remove
+- ▲/▼ buttons to reorder
+- "+ Add link" appends a blank item
+- "Save" button in each panel header calls `router.post(route('admin.navigation.update'), {location, items})`
 
 ---
 

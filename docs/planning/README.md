@@ -1,7 +1,7 @@
 # inteteam_cms — Master Plan
 
 **Repository:** `inteteam_cms` (standalone — does not share code with inteteam_crm)
-**Status:** Phase 1 — In Progress
+**Status:** Phase 1 — Complete ✅
 **Last Updated:** 2026-03-21
 
 ---
@@ -304,10 +304,10 @@ CRM blocks are rendered server-side at page request time: `CrmApiClient` fetches
 | Media uploads | 1 | ✅ Done | [`features/media/README.md`](features/media/README.md) |
 | Page builder (block editor) | 1 | ✅ Done | [`features/pages/README.md`](features/pages/README.md) |
 | Blog posts | 1 | ✅ Done | [`features/posts/README.md`](features/posts/README.md) |
-| Navigation menus | 1 | ⬜ Stub | `features/navigation/` |
-| Public site (Blade themes) | 1 | ⬜ Next | `features/theming/` |
-| SEO metadata, sitemap, robots.txt | 1 | ⬜ Next | `features/seo/` |
-| Site settings & branding | 1 | ⬜ Stub | `features/settings/` |
+| Navigation menus | 1 | ✅ Done | `features/navigation/` |
+| Public site (Blade themes) | 1 | ✅ Done | `features/theming/` |
+| SEO metadata, sitemap, robots.txt | 1 | ✅ Done | `features/seo/` |
+| Site settings & branding | 1 | ✅ Done | `features/settings/` |
 | CRM integration (gallery, forms, storefront) | 2 | ⬜ Planned | `features/crm_integration/` |
 | Revisions & staging preview | 2 | ⬜ Planned | `features/revisions/` |
 | MCP server — AI page editing | 2 | ⬜ Planned | `features/mcp/` |

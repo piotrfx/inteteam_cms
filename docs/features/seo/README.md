@@ -1,6 +1,6 @@
 # SEO Feature
 
-**Status:** Phase 1
+**Status:** Phase 1 — ✅ Implemented
 
 ---
 
@@ -211,39 +211,23 @@ For `contact` type pages, `@type` is `ContactPage`. All others use `WebPage`.
 
 ---
 
-## Service: `SeoMetaService`
+## Service: `SeoMetaService` — As Built
 
 ```php
 final class SeoMetaService
 {
-    public function forPage(CmsPage $page, Company $company): SeoMeta;
-    public function forPost(CmsPost $post, Company $company): SeoMeta;
-    public function sitemapEntries(Company $company): Collection;
+    public function forPage(CmsPage $page, Company $company): array;
+    public function forPost(CmsPost $post, Company $company): array;
+    public function forBlog(Company $company): array;
+    private function localBusinessSchema(Company $company): ?array;
 }
 ```
 
-Returns a `SeoMeta` readonly DTO:
+Returns an associative array `$seo` with keys: `title`, `description`, `canonical`, `robots`, `og_type`, `og_image`, `json_ld` (already `json_encode`d). Passed directly to the Blade layout from the public controllers.
 
-```php
-final readonly class SeoMeta
-{
-    public string  $title;
-    public string  $description;
-    public string  $canonical;
-    public string  $robots;
-    public string  $ogImage;
-    public string  $ogType;       // 'website' or 'article'
-    public string  $siteName;
-    public ?string $twitterHandle;
-    public string  $jsonLd;       // JSON-encoded string, pre-escaped for safe raw output
-}
-```
+SEO meta, OG, Twitter Card, JSON-LD are all rendered inline in `resources/views/themes/default/layouts/public.blade.php` (no separate partial).
 
-The Blade layout receives `$seo` and renders the full `<head>` block from a shared partial:
-
-```
-resources/views/partials/seo-head.blade.php
-```
+`SitemapController` in `App\Http\Controllers\Site\` handles `/sitemap.xml` and `/robots.txt` directly — not via `SeoMetaService`.
 
 ---
 

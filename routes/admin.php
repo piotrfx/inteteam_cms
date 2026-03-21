@@ -6,8 +6,10 @@ use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\NavigationController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,9 +72,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth:cms')->group(function (
     Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
     Route::post('posts/{post}/unpublish', [PostController::class, 'unpublish'])->name('posts.unpublish');
 
-    // Navigation (stub — full feature next sprint)
-    Route::get('navigation', fn () => inertia('Admin/Navigation/Index'))->name('navigation.index');
+    // Navigation
+    Route::get('navigation', [NavigationController::class, 'index'])->name('navigation.index');
+    Route::post('navigation', [NavigationController::class, 'update'])->name('navigation.update');
 
-    // Settings (stub — full feature next sprint)
-    Route::get('settings', fn () => inertia('Admin/Settings/Index'))->name('settings.index');
+    // Settings
+    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('settings', [SettingsController::class, 'update'])->name('settings.update');
 });

@@ -1,6 +1,6 @@
 # Theming Feature
 
-**Status:** Phase 1 (default theme) → Phase 4 (extractable to Next.js)
+**Status:** Phase 1 ✅ (default theme built) → Phase 4 (extractable to Next.js)
 
 ---
 
@@ -20,34 +20,32 @@ Phase 4 (optional) extracts the public site to a Next.js app that consumes a hea
 
 ---
 
-## Blade Layout Structure
+## Blade Layout Structure — As Built
 
 ```
 resources/views/
-├── layouts/
-│   └── public.blade.php     -- outer shell: <html>, <head>, <body>
-├── partials/
-│   ├── seo-head.blade.php   -- all meta, OG, Twitter, JSON-LD tags
-│   ├── header.blade.php     -- logo + primary nav + mobile hamburger
-│   └── footer.blade.php     -- footer nav + copyright + optional CRM branding
-├── pages/
-│   ├── show.blade.php       -- static page: title + block loop
-│   └── home.blade.php       -- home page: inherits show.blade.php
-├── posts/
-│   ├── index.blade.php      -- post list with pagination
-│   └── show.blade.php       -- single post: author, date, block loop
-└── blocks/
-    ├── rich_text.blade.php
-    ├── heading.blade.php
-    ├── image.blade.php
-    ├── cta.blade.php
-    ├── divider.blade.php
-    ├── raw_html.blade.php
-    ├── gallery.blade.php          (Phase 2)
-    ├── crm_form.blade.php         (Phase 2)
-    ├── storefront.blade.php       (Phase 2)
-    └── business_updates.blade.php (Phase 2)
+├── app.blade.php                          -- Inertia root (admin)
+├── sitemap.blade.php                      -- /sitemap.xml template
+└── themes/
+    └── default/
+        ├── layouts/
+        │   └── public.blade.php           -- <html>, <head> (SEO meta, JSON-LD, brand colour), <body>
+        ├── partials/
+        │   ├── header.blade.php           -- logo + nav items
+        │   └── footer.blade.php           -- footer nav + copyright
+        ├── blocks/
+        │   ├── heading.blade.php          -- H1–H6 (level from $data['level'])
+        │   ├── rich_text.blade.php        -- {!! $data['html'] !!}
+        │   ├── image.blade.php            -- <figure> + <figcaption>
+        │   ├── cta.blade.php              -- primary/secondary/outline button via match()
+        │   ├── divider.blade.php          -- <hr>
+        │   └── _unknown.blade.php         -- empty (silent fallback for unknown block types)
+        ├── page.blade.php                 -- extends layout, renders $renderedBlocks
+        ├── post.blade.php                 -- extends layout, featured image + blocks
+        └── blog.blade.php                 -- extends layout, post grid list
 ```
+
+SEO meta, OG, Twitter Card, JSON-LD, and CSS brand colour token are all emitted from `layouts/public.blade.php` directly — no separate seo-head partial in Phase 1.
 
 ---
 

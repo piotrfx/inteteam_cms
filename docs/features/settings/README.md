@@ -1,6 +1,6 @@
 # Settings Feature
 
-**Status:** Phase 1
+**Status:** Phase 1 — ✅ Implemented
 
 ---
 
@@ -68,59 +68,38 @@ See `features/crm_integration/README.md`.
 
 ---
 
-## Routes (`routes/admin.php`)
+## Routes (`routes/admin.php`) — As Built
 
 ```
-GET   /admin/settings                   → Admin\SettingsController::index
-POST  /admin/settings/general           → Admin\SettingsController::updateGeneral
-POST  /admin/settings/seo               → Admin\SettingsController::updateSeo
-POST  /admin/settings/business          → Admin\SettingsController::updateBusiness
-POST  /admin/settings/domain            → Admin\SettingsController::updateDomain
+GET   /admin/settings   → Admin\SettingsController::index   (name: admin.settings.index)
+POST  /admin/settings   → Admin\SettingsController::update  (name: admin.settings.update)
 ```
 
-Each tab POSTs to its own endpoint. This keeps validation isolated and avoids one giant update form.
+Phase 1 uses a single form/endpoint for all fields. The multi-tab split is deferred to Phase 2 when the CRM integration tab is added. Logo/favicon uploads are handled via `MediaService` in the `update` action.
 
 ---
 
-## Service: `CompanySettingsService`
+## Controller: `Admin\SettingsController` — As Built
 
-```php
-final class CompanySettingsService
-{
-    public function updateGeneral(Company $company, UpdateGeneralData $data): Company;
-    public function updateSeo(Company $company, UpdateSeoData $data): Company;
-    public function updateBusiness(Company $company, UpdateBusinessData $data): Company;
-    public function updateDomain(Company $company, UpdateDomainData $data): Company;
-}
-```
-
-`updateDomain()` validates:
-- The domain is a valid hostname
-- The domain is not already claimed by another company
-- Sets `domain = $data->domain` (DNS verification is passive — `ResolveTenant` will start resolving it once DNS propagates)
+No separate service — the controller delegates directly to `$company->update()` and `MediaService::upload()`. The admin-only gate uses `abort_unless(auth('cms')->user()?->role === 'admin', 403)`.
 
 ---
 
-## Admin UI (Inertia)
+## Admin UI (Inertia) — As Built
 
 ```
 resources/js/Pages/Admin/Settings/
-├── Index.tsx          -- tab shell, renders active tab
-├── General.tsx        -- general settings form
-├── Seo.tsx            -- SEO defaults form
-├── Business.tsx       -- business info form with opening hours builder
-├── Domain.tsx         -- domain settings
-└── CrmIntegration.tsx -- Phase 2
+└── Index.tsx   -- single-page form with three card sections
 ```
 
-Opening hours builder in `Business.tsx`: each row is a day-range selector + time picker. Days use a multi-select checkbox group (Mon, Tue, Wed...). Rows can be added/removed. Output is a JSON array:
+Sections in `Index.tsx`:
+1. **Branding** — Site name, brand colour (colour picker + hex input), theme select
+2. **SEO Defaults** — Site name (OG), title suffix, meta description (160 char max), robots, Twitter handle, Google verification code
+3. **Business Details** — street, city, postcode, phone, price range (used in LocalBusiness JSON-LD)
 
-```json
-[
-  { "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "open": "09:00", "close": "18:00" },
-  { "days": ["Saturday"], "open": "10:00", "close": "16:00" }
-]
-```
+Logo/favicon upload fields are planned but not wired in Phase 1 (`logo_path` / `favicon_path` columns exist on the model).
+
+Form uses `useForm` from `@inertiajs/react` and `post(route('admin.settings.update'))`.
 
 ---
 
