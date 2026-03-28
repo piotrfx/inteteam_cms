@@ -21,7 +21,7 @@ interface CompanySettings {
 }
 
 interface Props {
-    company: CompanySettings;
+    settings: CompanySettings;
 }
 
 function Field({ label, hint, error, children }: {
@@ -53,22 +53,22 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 const inputCls = 'w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 px-3 py-2 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500';
 
-export default function SettingsIndex({ company }: Props) {
+export default function SettingsIndex({ settings }: Props) {
     const { data, setData, post, processing, errors } = useForm({
-        name: company.name,
-        primary_colour: company.primary_colour,
-        theme: company.theme,
-        seo_site_name: company.seo_site_name ?? '',
-        seo_title_suffix: company.seo_title_suffix ?? '',
-        seo_meta_description: company.seo_meta_description ?? '',
-        seo_robots: company.seo_robots,
-        seo_google_verification: company.seo_google_verification ?? '',
-        seo_twitter_handle: company.seo_twitter_handle ?? '',
-        seo_address_street: company.seo_address_street ?? '',
-        seo_address_city: company.seo_address_city ?? '',
-        seo_address_postcode: company.seo_address_postcode ?? '',
-        seo_phone: company.seo_phone ?? '',
-        seo_price_range: company.seo_price_range ?? '',
+        name: settings.name,
+        primary_colour: settings.primary_colour,
+        theme: settings.theme,
+        seo_site_name: settings.seo_site_name ?? '',
+        seo_title_suffix: settings.seo_title_suffix ?? '',
+        seo_meta_description: settings.seo_meta_description ?? '',
+        seo_robots: settings.seo_robots,
+        seo_google_verification: settings.seo_google_verification ?? '',
+        seo_twitter_handle: settings.seo_twitter_handle ?? '',
+        seo_address_street: settings.seo_address_street ?? '',
+        seo_address_city: settings.seo_address_city ?? '',
+        seo_address_postcode: settings.seo_address_postcode ?? '',
+        seo_phone: settings.seo_phone ?? '',
+        seo_price_range: settings.seo_price_range ?? '',
     });
 
     function submit(e: React.FormEvent) {
@@ -139,8 +139,8 @@ export default function SettingsIndex({ company }: Props) {
                             <Field label="Default Robots">
                                 <select value={data.seo_robots} onChange={(e) => setData('seo_robots', e.target.value)}
                                     className={inputCls}>
-                                    <option value="index">index, follow</option>
-                                    <option value="noindex">noindex</option>
+                                    <option value="index,follow">index, follow</option>
+                                    <option value="noindex,nofollow">noindex, nofollow</option>
                                 </select>
                             </Field>
                             <Field label="Twitter Handle">

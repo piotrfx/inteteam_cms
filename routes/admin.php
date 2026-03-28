@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\RevisionController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\StagedController;
+use App\Http\Middleware\ResolveTenantFromAuth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,7 +45,7 @@ Route::post('admin/logout', [LoginController::class, 'logout'])
     ->middleware('auth:cms');
 
 // ── Authenticated admin panel ─────────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->middleware('auth:cms')->group(function (): void {
+Route::prefix('admin')->name('admin.')->middleware(['auth:cms', ResolveTenantFromAuth::class])->group(function (): void {
 
     Route::get('dashboard', function () {
         return inertia('Admin/Dashboard');

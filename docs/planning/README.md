@@ -1,7 +1,7 @@
 # inteteam_cms — Master Plan
 
 **Repository:** `inteteam_cms` (standalone — does not share code with inteteam_crm)
-**Status:** Phase 1 — Complete ✅
+**Status:** Phase 2 — Complete ✅ | Phase 3 (SSO) — Next
 **Last Updated:** 2026-03-21
 
 ---
@@ -308,9 +308,9 @@ CRM blocks are rendered server-side at page request time: `CrmApiClient` fetches
 | Public site (Blade themes) | 1 | ✅ Done | `features/theming/` |
 | SEO metadata, sitemap, robots.txt | 1 | ✅ Done | `features/seo/` |
 | Site settings & branding | 1 | ✅ Done | `features/settings/` |
-| CRM integration (gallery, forms, storefront) | 2 | ⬜ Planned | `features/crm_integration/` |
-| Revisions & staging preview | 2 | ⬜ Planned | `features/revisions/` |
-| MCP server — AI page editing | 2 | ⬜ Planned | `features/mcp/` |
+| CRM integration (gallery, forms, storefront) | 2 | ✅ Done | `features/crm_integration/` |
+| Revisions & staging preview | 2 | ✅ Done | `features/revisions/` |
+| MCP server — AI page editing | 2 | ✅ Done | `features/mcp/` |
 | Authentication — SSO | 3 | ⬜ Planned | `features/auth/` |
 
 ---
@@ -330,7 +330,7 @@ A shop owner can log in, manage their site, build pages/posts with local blocks,
 - SEO: per-page meta, OG, Twitter Card, JSON-LD, sitemap.xml, robots.txt
 - PHPUnit feature test suite
 
-### Phase 2 — CRM Integration + AI Editing
+### Phase 2 — CRM Integration + AI Editing ✅ Complete
 
 Shop owners can embed live CRM data and let an AI assistant edit their pages.
 
@@ -346,7 +346,7 @@ Shop owners can embed live CRM data and let an AI assistant edit their pages.
 - `cms_mcp_tokens`: per-company API keys for AI clients
 - AI edits always go to staged revision — never directly to live
 
-### Phase 3 — SSO
+### Phase 3 — SSO ⬜ Pending inteteam_sso going live
 
 One login for CRM + CMS.
 

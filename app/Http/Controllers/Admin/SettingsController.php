@@ -24,23 +24,23 @@ final class SettingsController extends Controller
         $company = app('current_company');
 
         return Inertia::render('Admin/Settings/Index', [
-            'company' => [
-                'name'                    => $company->name,
-                'primary_colour'          => $company->primary_colour ?? '#4f46e5',
-                'theme'                   => $company->theme ?? 'default',
-                'logo_path'               => $company->logo_path,
-                'favicon_path'            => $company->favicon_path,
-                'seo_site_name'           => $company->seo_site_name,
-                'seo_title_suffix'        => $company->seo_title_suffix,
-                'seo_meta_description'    => $company->seo_meta_description,
-                'seo_robots'              => $company->seo_robots ?? 'index',
+            'settings' => [
+                'name' => $company->name,
+                'primary_colour' => $company->primary_colour ?? '#4f46e5',
+                'theme' => $company->theme ?? 'default',
+                'logo_path' => $company->logo_path,
+                'favicon_path' => $company->favicon_path,
+                'seo_site_name' => $company->seo_site_name,
+                'seo_title_suffix' => $company->seo_title_suffix,
+                'seo_meta_description' => $company->seo_meta_description,
+                'seo_robots' => $company->seo_robots ?? 'index,follow',
                 'seo_google_verification' => $company->seo_google_verification,
-                'seo_twitter_handle'      => $company->seo_twitter_handle,
-                'seo_address_street'      => $company->seo_address_street,
-                'seo_address_city'        => $company->seo_address_city,
-                'seo_address_postcode'    => $company->seo_address_postcode,
-                'seo_phone'               => $company->seo_phone,
-                'seo_price_range'         => $company->seo_price_range,
+                'seo_twitter_handle' => $company->seo_twitter_handle,
+                'seo_address_street' => $company->seo_address_street,
+                'seo_address_city' => $company->seo_address_city,
+                'seo_address_postcode' => $company->seo_address_postcode,
+                'seo_phone' => $company->seo_phone,
+                'seo_price_range' => $company->seo_price_range,
             ],
         ]);
     }
