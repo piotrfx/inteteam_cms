@@ -31,6 +31,7 @@ use App\Services\Mcp\Tools\UpdatePageBlocksTool;
 use App\Services\Mcp\Tools\UpdatePageSeoTool;
 use App\Services\Mcp\Tools\UpdatePostBlocksTool;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
@@ -52,6 +53,10 @@ final class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         Gate::policy(CmsMedia::class, CmsMediaPolicy::class);
         Gate::policy(CmsPage::class, CmsPagePolicy::class);
         Gate::policy(CmsPost::class, CmsPostPolicy::class);

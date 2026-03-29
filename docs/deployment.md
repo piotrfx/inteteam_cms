@@ -50,11 +50,13 @@ The setup script handles:
 
 ### Post-Setup Manual Steps
 
-1. **Set APP_URL** in `.env`:
+1. **Set APP_URL and TRUSTED_PROXIES** in `.env`:
    ```
    APP_URL=https://cms.inte.team
    APP_PORT=8092
+   TRUSTED_PROXIES=*
    ```
+   `TRUSTED_PROXIES=*` is required because the app sits behind Nginx Proxy Manager. Without it, Laravel won't trust the forwarded HTTPS headers, causing mixed-content errors (assets loaded over HTTP on an HTTPS page).
 
 2. **Set APP_PORT** to avoid conflicts with other apps on the server (default 8090, production uses 8092).
 
@@ -73,11 +75,20 @@ The setup script handles:
    - Force SSL: yes
    - Wildcard: `*.cms.inte.team` (for tenant subdomains)
 
-5. **Rebuild caches** after .env changes:
+5. **Recreate containers and rebuild caches** after `.env` changes:
    ```bash
+   # Recreate — docker-compose.yml uses env_file: .env, so containers
+   # must be recreated (not just restarted) to pick up .env changes.
+   # A plain "docker compose restart" does NOT re-read env_file.
+   docker compose up -d --force-recreate php-fpm queue
+   docker compose restart nginx
+
+   # Rebuild Laravel caches inside the new containers
+   docker compose exec php-fpm php artisan config:clear
    docker compose exec php-fpm php artisan config:cache
    docker compose exec php-fpm php artisan route:cache
    ```
+   The setup script caches config before you edit `.env`. If you skip these steps, Laravel keeps using old (or empty) values — including `APP_KEY`, which causes a 500 "No application encryption key" error. Nginx must also be restarted because it caches the upstream php-fpm IP, which changes after container recreation (causes 502 Bad Gateway).
 
 ---
 
@@ -148,6 +159,7 @@ APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://cms.inte.team
 APP_PORT=8092
+TRUSTED_PROXIES=*
 
 LOG_LEVEL=warning
 
