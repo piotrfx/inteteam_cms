@@ -94,10 +94,11 @@ export default function PostsEdit({ post }: Props) {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-1">Excerpt</label>
+                            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-1">Excerpt (short summary)</label>
                             <textarea
                                 value={data.excerpt}
                                 onChange={(e) => setData('excerpt', e.target.value)}
+                                placeholder="A brief description shown in post listings and search results"
                                 rows={3}
                                 className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                             />

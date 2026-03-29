@@ -183,9 +183,14 @@ export default function SettingsIndex({ settings }: Props) {
                                     className={inputCls} placeholder="+44 ..." />
                             </Field>
                             <Field label="Price Range">
-                                <input type="text" value={data.seo_price_range}
+                                <select value={data.seo_price_range}
                                     onChange={(e) => setData('seo_price_range', e.target.value)}
-                                    className={inputCls} placeholder="£ / ££ / £££" />
+                                    className={inputCls}>
+                                    <option value="">— None —</option>
+                                    <option value="£">£ (Budget)</option>
+                                    <option value="££">££ (Mid-range)</option>
+                                    <option value="£££">£££ (Premium)</option>
+                                </select>
                             </Field>
                         </div>
                     </Section>

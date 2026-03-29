@@ -30,7 +30,7 @@ final class UpdateSettingsRequest extends FormRequest
             'seo_address_city' => ['nullable', 'string', 'max:100'],
             'seo_address_postcode' => ['nullable', 'string', 'max:20'],
             'seo_phone' => ['nullable', 'string', 'max:30'],
-            'seo_price_range' => ['nullable', 'string', 'max:10'],
+            'seo_price_range' => ['nullable', Rule::in(['£', '££', '£££'])],
         ];
     }
 }
