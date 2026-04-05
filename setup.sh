@@ -6,6 +6,15 @@ set -euo pipefail
 # Usage:
 #   bash setup.sh              (local dev)
 #   bash setup.sh --prod       (production, Caddy handles SSL)
+#
+# WARNING: This script runs `docker compose up -d --build`.
+# On servers with OTHER services (NPM, Mailu, CRM, etc.)
+# this can disrupt shared Docker networks and bring down
+# co-hosted services.
+#
+# For production config changes: edit docker-compose files
+# directly and restart only the affected container.
+# ONLY use this script for FIRST-TIME deployment.
 # ============================================================
 
 PROFILE="dev"
